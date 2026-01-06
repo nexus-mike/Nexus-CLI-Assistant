@@ -5,12 +5,14 @@ A lightweight CLI tool that provides quick AI-powered answers to Linux, Docker, 
 ## Features
 
 - 🤖 **Multiple AI Providers**: Ollama (local), OpenAI, Anthropic (Claude), and DeepSeek
+- ⚙️ **Easy Provider Switching**: Change default AI provider with a simple command
 - 💾 **Command Saving**: Save your favorite commands in organized categories
 - 📜 **Command History**: Track your queries for quick access
 - ⚡ **Quick Snippets**: Instant access to saved commands without AI processing
 - 🚦 **Rate Limiting**: Built-in rate limiting to manage API costs
 - 💨 **Caching**: Cache common questions for instant responses
-- 🎨 **Rich Output**: Beautiful terminal output with brief and verbose modes
+- 🎨 **Structured Output**: Beautiful formatted answers with Commands and Explanation sections
+- 📝 **Syntax Highlighting**: Code blocks with proper syntax highlighting
 - 🔒 **Virtual Environment**: Isolated Python environment for dependencies
 
 ## Installation
@@ -127,9 +129,11 @@ Or use a `.env` file (copy from `.env.example`).
 
 ### Ask Questions
 
-Ask a quick question:
+Ask a quick question (quotes optional):
 ```bash
 nexus ask "how to check UFW firewall status"
+# or without quotes
+nexus ask how to check UFW firewall status
 ```
 
 Get a verbose answer:
@@ -201,19 +205,30 @@ View current configuration:
 nexus config
 ```
 
+Change default AI provider:
+```bash
+nexus config --set-provider ollama
+nexus config --set-provider openai
+nexus config --set-provider anthropic
+nexus config --set-provider deepseek
+```
+
+The default provider is used for all `nexus ask` commands. You can change it anytime, and the setting persists in your config file.
+
 ## Commands Reference
 
 | Command | Description |
 |---------|-------------|
-| `nexus ask <question>` | Ask a question (checks cache first) |
-| `nexus ask --verbose <question>` | Get verbose answer |
-| `nexus save <category> <command>` | Save a command |
+| `nexus ask <question>` | Ask a question (quotes optional, checks cache first) |
+| `nexus ask --verbose <question>` | Get verbose answer with full details |
+| `nexus save <category> <command>` | Save a command with category |
 | `nexus save --category <cat> <command>` | Save with category flag |
-| `nexus list [--category <cat>]` | List saved commands |
-| `nexus quick <keyword>` | Quick access to saved commands |
+| `nexus list [--category <cat>]` | List saved commands (optionally filtered) |
+| `nexus quick <keyword>` | Quick access to saved commands (no AI) |
 | `nexus history [--limit N]` | View command history |
-| `nexus delete <id>` | Delete a saved command |
-| `nexus config` | Show configuration |
+| `nexus delete <id>` | Delete a saved command by ID |
+| `nexus config` | Show current configuration |
+| `nexus config --set-provider <provider>` | Set default AI provider |
 
 ## Virtual Environment
 
@@ -231,6 +246,24 @@ alias nexus='source /path/to/nexus-cli-assistant/venv/bin/activate && nexus'
 ```
 
 ## Features in Detail
+
+### Structured Output Formatting
+
+Answers are displayed in organized sections:
+- **📋 Commands**: Syntax-highlighted code blocks with all detected commands
+- **💡 Explanation**: Formatted markdown with full context and details
+
+This makes it easy to quickly find the commands you need while still having access to detailed explanations.
+
+### Default AI Provider
+
+The default AI provider is set in your configuration file (`~/.config/nexus/config.yaml`). By default, it's set to `ollama` for local AI processing. You can change it using:
+
+```bash
+nexus config --set-provider <provider>
+```
+
+Available providers: `ollama`, `openai`, `anthropic`, `deepseek`
 
 ### Command History
 

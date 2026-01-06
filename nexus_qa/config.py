@@ -120,3 +120,32 @@ def get_config_path() -> Path:
     """Get the path to the configuration file."""
     return Path.home() / ".config" / "nexus" / "config.yaml"
 
+
+def set_default_provider(provider: str) -> None:
+    """Set the default AI provider in the configuration file."""
+    config_path = get_config_path()
+    
+    if not config_path.exists():
+        raise FileNotFoundError(f"Configuration file not found: {config_path}")
+    
+    # Load current config
+    with open(config_path, "r", encoding="utf-8") as f:
+        config_data = yaml.safe_load(f) or {}
+    
+    # Validate provider
+    valid_providers = ["ollama", "openai", "anthropic", "deepseek"]
+    if provider.lower() not in valid_providers:
+        raise ValueError(f"Invalid provider: {provider}. Valid options: {', '.join(valid_providers)}")
+    
+    # Check if provider is configured
+    providers = config_data.get("providers", {})
+    if provider.lower() not in providers:
+        raise ValueError(f"Provider '{provider}' is not configured. Please add it to the config file first.")
+    
+    # Update provider
+    config_data["ai_provider"] = provider.lower()
+    
+    # Write back to file
+    with open(config_path, "w", encoding="utf-8") as f:
+        yaml.dump(config_data, f, default_flow_style=False, sort_keys=False)
+

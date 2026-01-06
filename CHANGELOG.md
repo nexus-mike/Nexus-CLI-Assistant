@@ -15,11 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for questions without quotes (automatic word joining)
 - Improved syntax highlighting for code blocks
 - Better visual presentation with bordered panels
+- `nexus config --set-provider <provider>` command to change default AI provider
+- Enhanced configuration display showing current default provider
 
 ### Improved
 - Command extraction now handles multiple formats (numbered lists, backticks, code blocks)
 - Better pattern matching for command detection
 - Enhanced explanation formatting with markdown support
+- Configuration management with easy provider switching
 
 ## [0.1.0] - 2024-01-06
 

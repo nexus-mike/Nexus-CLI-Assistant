@@ -164,15 +164,33 @@ def delete(command_id: int):
 
 
 @cli.command()
-def config():
-    """Show current configuration."""
-    config = load_config()
-    formatter = Formatter()
+@click.argument("provider", required=False)
+@click.option("--set-provider", "-s", "set_provider", help="Set default AI provider (ollama, openai, anthropic, deepseek)")
+def config(provider: str, set_provider: str):
+    """Show or set current configuration.
     
+    Show config: nexus config
+    Set provider: nexus config --set-provider ollama
+    """
+    formatter = Formatter()
     config_path = get_config_path()
     
+    # If setting provider
+    if set_provider:
+        from nexus_qa.config import set_default_provider
+        try:
+            set_default_provider(set_provider)
+            formatter.format_success(f"Default provider set to: {set_provider}")
+            formatter.format_info(f"Configuration updated in: {config_path}")
+        except Exception as e:
+            formatter.format_error(str(e))
+        return
+    
+    # Show current configuration
+    config = load_config()
+    
     formatter.format_info(f"Configuration file: {config_path}")
-    formatter.format_info(f"AI Provider: {config.ai_provider}")
+    formatter.format_info(f"AI Provider: [bold cyan]{config.ai_provider}[/bold cyan] (default)")
     formatter.format_info(f"Default Model: {config.default_model}")
     formatter.format_info(f"Output Mode: {config.output_mode}")
     formatter.format_info(f"Rate Limiting: {'Enabled' if config.rate_limiting.enabled else 'Disabled'}")
@@ -181,7 +199,10 @@ def config():
     if config.providers:
         formatter.format_info("\nConfigured Providers:")
         for name, provider_config in config.providers.items():
-            formatter.format_info(f"  - {name}: {provider_config.model}")
+            marker = " ← current" if name == config.ai_provider else ""
+            formatter.format_info(f"  - {name}: {provider_config.model}{marker}")
+    
+    formatter.format_info("\nTo change default provider: nexus config --set-provider <provider>")
 
 
 if __name__ == "__main__":

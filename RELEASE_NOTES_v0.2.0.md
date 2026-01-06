@@ -23,10 +23,20 @@
   - `nexus ask "how to check docker status"` ✅ (still works)
 - Automatic word joining for multi-word questions
 
+### ⚙️ Configuration Management
+- **Set Default Provider**: Easily change your default AI provider
+  ```bash
+  nexus config --set-provider ollama
+  nexus config --set-provider openai
+  ```
+- Enhanced configuration display showing current default provider
+- Provider validation to ensure only configured providers can be set
+
 ### 🎯 Other Improvements
 - Enhanced syntax highlighting for code blocks
 - Better markdown rendering in explanations
 - Improved error messages and user feedback
+- Questions can be asked without quotes (automatic word joining)
 
 ## Installation
 

@@ -1,14 +1,15 @@
 # Nexus CLI Assistant
 
-A lightweight CLI tool that provides quick AI-powered answers to Linux, Docker, Ollama, and system administration questions directly from your terminal. Supports local (Ollama) and cloud AI models, with command saving, categorization, history tracking, quick snippets, rate limiting, and caching.
+A lightweight CLI tool that provides quick AI-powered answers to Linux, Docker, Ollama, and system administration questions directly from your terminal. Get instant code snippets, commands, and solutions without leaving your bash shell. Supports local (Ollama) and cloud AI models, with command saving, categorization, history tracking, quick snippets, rate limiting, and caching.
 
 ## Features
 
 - 🤖 **Multiple AI Providers**: Ollama (local), OpenAI, Anthropic (Claude), and DeepSeek
+- ⚡ **Quick Code Generation**: Get instant code snippets, scripts, and commands directly in your terminal
 - ⚙️ **Easy Provider Switching**: Change default AI provider with a simple command
 - 💾 **Command Saving**: Save your favorite commands in organized categories
 - 📜 **Command History**: Track your queries for quick access
-- ⚡ **Quick Snippets**: Instant access to saved commands without AI processing
+- 🔍 **Quick Snippets**: Instant access to saved commands without AI processing
 - 🚦 **Rate Limiting**: Built-in rate limiting to manage API costs
 - 💨 **Caching**: Cache common questions for instant responses
 - 🎨 **Structured Output**: Beautiful formatted answers with Commands and Explanation sections
@@ -126,6 +127,26 @@ export DEEPSEEK_API_KEY="your-key-here"
 Or use a `.env` file (copy from `.env.example`).
 
 ## Usage
+
+### Quick Code Generation
+
+Get instant code snippets and commands directly from your terminal - perfect for when you need something quick without leaving bash:
+
+```bash
+# Generate a Python script
+nexus ask "create a Python function to parse JSON and extract email addresses"
+
+# Get a bash one-liner
+nexus ask "bash command to find all files modified in last 24 hours"
+
+# Get a Docker command
+nexus ask "docker command to run a container with port mapping and volume mount"
+
+# Generate a complete script
+nexus ask "create a shell script to backup MySQL database with timestamp"
+```
+
+The tool extracts and highlights all code blocks and commands, making it easy to copy and use them immediately.
 
 ### Ask Questions
 
@@ -246,6 +267,17 @@ alias nexus='source /path/to/nexus-cli-assistant/venv/bin/activate && nexus'
 ```
 
 ## Features in Detail
+
+### Quick Code Generation from Terminal
+
+Perfect for developers who need instant code snippets without leaving their terminal. Simply ask for what you need:
+
+- **Generate scripts**: Create complete bash, Python, or other scripts on the fly
+- **Get commands**: Instantly retrieve Linux, Docker, or system administration commands
+- **Code snippets**: Get ready-to-use code blocks with proper syntax highlighting
+- **One-liners**: Quick bash one-liners for common tasks
+
+All code is automatically extracted and highlighted, making it easy to copy and paste directly into your workflow. No need to switch to a browser or IDE - get your code right where you need it.
 
 ### Structured Output Formatting
 

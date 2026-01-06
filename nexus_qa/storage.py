@@ -211,23 +211,27 @@ class Storage:
         """Get a cache entry by query hash."""
         conn = self._get_connection()
         cursor = conn.cursor()
+        # Compare using ISO format to match how we store it
         cursor.execute(
-            "SELECT * FROM cache WHERE query_hash = ? AND expires_at > datetime('now')",
+            "SELECT * FROM cache WHERE query_hash = ?",
             (query_hash,)
         )
         row = cursor.fetchone()
         conn.close()
         
         if row:
-            return CacheEntry(
-                id=row["id"],
-                query_hash=row["query_hash"],
-                query_text=row["query_text"],
-                response=row["response"],
-                provider=row["provider"],
-                created_at=datetime.fromisoformat(row["created_at"]) if row["created_at"] else None,
-                expires_at=datetime.fromisoformat(row["expires_at"]),
-            )
+            expires_at = datetime.fromisoformat(row["expires_at"])
+            # Check expiration in Python to ensure accurate comparison
+            if expires_at > datetime.now():
+                return CacheEntry(
+                    id=row["id"],
+                    query_hash=row["query_hash"],
+                    query_text=row["query_text"],
+                    response=row["response"],
+                    provider=row["provider"],
+                    created_at=datetime.fromisoformat(row["created_at"]) if row["created_at"] else None,
+                    expires_at=expires_at,
+                )
         return None
     
     def save_cache(self, query_hash: str, query_text: str, response: str, 
@@ -250,11 +254,21 @@ class Storage:
         """Remove expired cache entries."""
         conn = self._get_connection()
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM cache WHERE expires_at <= datetime('now')")
-        deleted = cursor.rowcount
+        # Get all entries and filter in Python for accurate datetime comparison
+        cursor.execute("SELECT * FROM cache")
+        rows = cursor.fetchall()
+        now = datetime.now()
+        deleted_count = 0
+        
+        for row in rows:
+            expires_at = datetime.fromisoformat(row["expires_at"])
+            if expires_at <= now:
+                cursor.execute("DELETE FROM cache WHERE id = ?", (row["id"],))
+                deleted_count += 1
+        
         conn.commit()
         conn.close()
-        return deleted
+        return deleted_count
     
     def get_cache_count(self) -> int:
         """Get total number of cache entries."""

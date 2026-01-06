@@ -7,6 +7,14 @@ ENV/
 # Private Docs
 docs-private/
 
+# Test files (local developer use only)
+tests/
+run_tests.py
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+
 # Python
 __pycache__/
 *.py[cod]

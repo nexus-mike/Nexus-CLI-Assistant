@@ -105,7 +105,7 @@ def _create_default_config(config_path: Path) -> Config:
         "providers": {
             "ollama": {
                 "base_url": "http://localhost:11434",
-                "model": "llama3.2",
+                "model": "llama3.2",  # Free and local - no API costs
             },
         },
     }

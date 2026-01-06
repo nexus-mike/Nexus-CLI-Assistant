@@ -95,21 +95,21 @@ cache:
 providers:
   ollama:
     base_url: http://localhost:11434
-    model: llama3.2
+    model: llama3.2  # Free and local - no API costs!
   
   openai:
     api_key: ${OPENAI_API_KEY}
-    model: gpt-4o-mini
+    model: gpt-4o-mini  # Recommended: gpt-5.2 (latest), gpt-4o-mini (cost-effective), or gpt-4o (high quality)
     rate_limit: 60
   
   anthropic:
     api_key: ${ANTHROPIC_API_KEY}
-    model: claude-3-5-sonnet-20241022
+    model: claude-3.5-sonnet-20241022  # Recommended: claude-4-sonnet (latest), claude-4-opus (premium), or claude-3.5-sonnet (stable)
     rate_limit: 50
   
   deepseek:
     api_key: ${DEEPSEEK_API_KEY}
-    model: deepseek-chat
+    model: deepseek-chat  # Recommended: deepseek-chat or deepseek-coder
     base_url: https://api.deepseek.com
     rate_limit: 60
 ```
@@ -125,6 +125,108 @@ export DEEPSEEK_API_KEY="your-key-here"
 ```
 
 Or use a `.env` file (copy from `.env.example`).
+
+### AI Models and Recommendations
+
+#### Choosing the Right Model for Code Generation
+
+Different AI providers offer various models optimized for different use cases. Here's a guide to help you choose:
+
+##### **Ollama (Free & Local)**
+- **Best for**: Privacy, offline use, no API costs
+- **Recommended models**:
+  - `llama3.2` - Good general purpose, fast (default)
+  - `llama3.1` - Better reasoning, slightly slower
+  - `codellama` - Specialized for code generation
+  - `mistral` or `mixtral` - Excellent code quality
+- **Cost**: Free (runs locally on your machine)
+- **Setup**: [Install Ollama](https://ollama.ai/download)
+
+##### **OpenAI (Premium)**
+- **Best for**: High-quality code generation, complex tasks
+- **Recommended models for code**:
+  - **`gpt-5.2`** - ⭐ Latest model, best quality, excellent for complex code (latest, premium)
+    - Cost: ~$1.75 per 1M input tokens, ~$14 per 1M output tokens
+    - Best for: Complex scripts, production code, advanced debugging
+    - Features: Updated knowledge, improved coding capabilities
+  - **`gpt-4o`** - ⭐ High quality, excellent for complex code generation
+    - Cost: ~$2.50-5.00 per 1M input tokens, ~$10-15 per 1M output tokens
+    - Best for: Complex scripts, production code, debugging
+  - **`gpt-4o-mini`** - ⭐ Recommended balance of quality and cost
+    - Cost: ~$0.15 per 1M input tokens, ~$0.60 per 1M output tokens
+    - Best for: Most code generation tasks, quick scripts
+  - `gpt-4-turbo` - High quality, good for complex code
+    - Cost: ~$10 per 1M input tokens, ~$30 per 1M output tokens
+  - `gpt-3.5-turbo` - Fast and budget-friendly
+    - Cost: ~$0.50 per 1M input tokens, ~$1.50 per 1M output tokens
+- **Sign up**: [OpenAI Platform](https://platform.openai.com/signup)
+- **Pricing**: [OpenAI Pricing](https://openai.com/api/pricing/)
+
+##### **Anthropic Claude (Premium)**
+- **Best for**: Excellent reasoning, complex code, long context
+- **Recommended models for code**:
+  - **`claude-4-opus`** - ⭐ Latest, highest quality, best for complex code (latest, premium)
+    - Cost: Check current pricing (varies by plan)
+    - Best for: Complex code, advanced debugging, agent workflows
+    - Features: Enhanced coding and reasoning capabilities
+  - **`claude-4-sonnet`** - ⭐ Latest, excellent for code, great balance (latest, recommended)
+    - Cost: Check current pricing (varies by plan)
+    - Best for: Complex code, debugging, refactoring, wide range of applications
+    - Features: Improved coding capabilities, balanced performance
+  - **`claude-3.5-sonnet`** - ⭐ Best for code generation, excellent reasoning
+    - Cost: ~$3 per 1M input tokens, ~$15 per 1M output tokens
+    - Best for: Complex code, debugging, refactoring
+  - `claude-3-opus` - High quality, best for complex code
+    - Cost: ~$15 per 1M input tokens, ~$75 per 1M output tokens
+  - `claude-3-sonnet` - Good balance
+    - Cost: ~$3 per 1M input tokens, ~$15 per 1M output tokens
+  - `claude-3-haiku` - Fast and cost-effective
+    - Cost: ~$0.25 per 1M input tokens, ~$1.25 per 1M output tokens
+- **Sign up**: [Anthropic Console](https://console.anthropic.com/signup)
+- **Pricing**: [Anthropic Pricing](https://www.anthropic.com/pricing)
+- **Note**: Claude 4 models available to Pro, Max, Team, and Enterprise subscribers
+
+##### **DeepSeek (Budget-Friendly)**
+- **Best for**: Cost-effective code generation
+- **Recommended models**:
+  - **`deepseek-chat`** - General purpose, good for code (recommended)
+    - Cost: ~$0.14 per 1M input tokens, ~$0.28 per 1M output tokens
+  - `deepseek-coder` - Specialized for code generation
+    - Cost: ~$0.14 per 1M input tokens, ~$0.28 per 1M output tokens
+- **Sign up**: [DeepSeek Platform](https://platform.deepseek.com/signup)
+- **Pricing**: [DeepSeek Pricing](https://www.deepseek.com/pricing)
+
+#### Cost Comparison for Code Generation
+
+For typical code generation tasks (100-500 tokens per request):
+
+| Model | Cost per 1000 requests* | Quality | Speed |
+|-------|------------------------|---------|-------|
+| Ollama (local) | **$0.00** | Good | Fast |
+| DeepSeek Chat | **~$0.10** | Good | Fast |
+| GPT-4o-mini | **~$0.15** | Excellent | Fast |
+| Claude 3.5 Sonnet | **~$0.50** | Excellent | Medium |
+| GPT-5.2 | **~$0.75** | Best | Medium |
+| GPT-4o | **~$1.00** | Best | Medium |
+| Claude 4 Sonnet | **~$1.50** | Best | Medium |
+| Claude 3 Opus | **~$2.50** | Best | Slower |
+| Claude 4 Opus | **~$3.00+** | Best | Slower |
+
+*Approximate costs for typical code generation queries. Actual costs vary based on query length and complexity.
+
+#### Recommendations
+
+- **For beginners or testing**: Start with **Ollama** (free) or **GPT-4o-mini** (low cost)
+- **For production code**: Use **Claude 4 Sonnet**, **GPT-5.2**, or **Claude 3.5 Sonnet** (latest and best quality)
+- **For complex/advanced code**: Use **Claude 4 Opus** or **GPT-5.2** (latest premium models)
+- **For budget-conscious users**: **DeepSeek Chat** or **GPT-4o-mini** offer great value
+- **For privacy-sensitive work**: Use **Ollama** (runs locally, no data sent to cloud)
+
+#### Getting API Credits
+
+1. **OpenAI**: Sign up at [platform.openai.com](https://platform.openai.com/signup) - $5 free credits for new users
+2. **Anthropic**: Sign up at [console.anthropic.com](https://console.anthropic.com/signup) - Check current promotions
+3. **DeepSeek**: Sign up at [platform.deepseek.com](https://platform.deepseek.com/signup) - Very affordable pricing
 
 ## Usage
 

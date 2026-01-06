@@ -20,20 +20,38 @@ cache:
 providers:
   ollama:
     base_url: http://localhost:11434  # Change if Ollama is in Docker with different port
-    model: llama3.2  # Use: ollama list to see available models
+    model: llama3.2  # Recommended: llama3.2, llama3.1, codellama, mistral, mixtral
+    # Use: ollama list to see available models
+    # Free and local - no API costs!
   
   openai:
     api_key: ${OPENAI_API_KEY}
+    # Recommended models for code generation:
+    # - gpt-5.2: Latest model, best quality, excellent for complex code (premium, latest)
+    # - gpt-4o: High quality, excellent for complex code (premium)
+    # - gpt-4o-mini: Fast and cost-effective, good for simple code (recommended)
+    # - gpt-4-turbo: High quality, good balance (premium)
+    # - gpt-3.5-turbo: Fastest, basic code generation (budget)
     model: gpt-4o-mini
     rate_limit: 60  # requests per minute
   
   anthropic:
     api_key: ${ANTHROPIC_API_KEY}
-    model: claude-3-5-sonnet-20241022
+    # Recommended models for code generation:
+    # - claude-4-opus: Latest, highest quality, best for complex code (premium, latest)
+    # - claude-4-sonnet: Latest, excellent for code, great balance (premium, latest, recommended)
+    # - claude-3.5-sonnet: Best for code, excellent reasoning (premium)
+    # - claude-3-opus: High quality, best for complex code (premium)
+    # - claude-3-sonnet: Good balance of quality and cost (premium)
+    # - claude-3-haiku: Fast and cost-effective (budget)
+    model: claude-3.5-sonnet-20241022
     rate_limit: 50
   
   deepseek:
     api_key: ${DEEPSEEK_API_KEY}
+    # Recommended models:
+    # - deepseek-chat: General purpose, good for code (recommended)
+    # - deepseek-coder: Specialized for code generation (best for code)
     model: deepseek-chat
     base_url: https://api.deepseek.com
     rate_limit: 60

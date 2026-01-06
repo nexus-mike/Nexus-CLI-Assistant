@@ -15,6 +15,10 @@ A lightweight CLI tool that provides quick AI-powered answers to Linux, Docker, 
 - 🎨 **Structured Output**: Beautiful formatted answers with Commands and Explanation sections
 - 📝 **Syntax Highlighting**: Code blocks with proper syntax highlighting
 - 🔒 **Virtual Environment**: Isolated Python environment for dependencies
+- 🐛 **Error Debugging**: Debug error messages instantly without leaving your terminal
+- 📖 **Command Explanation**: Understand complex commands with detailed breakdowns
+- 🛡️ **Safety Checks**: Verify command safety before execution
+- 📜 **Script Generation**: Generate production-ready scripts with best practices
 
 ## Installation
 
@@ -338,12 +342,112 @@ nexus config --set-provider deepseek
 
 The default provider is used for all `nexus ask` commands. You can change it anytime, and the setting persists in your config file.
 
+### Error Debugging
+
+Debug error messages instantly without leaving your terminal:
+
+```bash
+# Debug an error message
+nexus debug "docker: Error response from daemon: port is already allocated"
+
+# Or pipe directly from a command
+docker run -p 80:80 nginx 2>&1 | nexus debug
+
+# With verbose output
+nexus debug --verbose "Permission denied: /var/log/app.log"
+```
+
+The debug command analyzes error messages and provides:
+- What the error means
+- Why it occurred
+- Step-by-step solutions
+- How to prevent it in the future
+
+### Command Explanation
+
+Understand complex commands with detailed breakdowns:
+
+```bash
+# Explain a command
+nexus explain "docker run -d -p 8080:80 -v /data:/app/data --name myapp nginx:latest"
+
+# Explain commands from a file
+nexus explain --file deploy.sh
+
+# Beginner-friendly explanation
+nexus explain --learn "docker compose up"
+
+# With verbose output
+nexus explain --verbose "kubectl apply -f deployment.yaml"
+```
+
+The explain command breaks down:
+- Each flag and argument
+- What each part does
+- Common use cases
+- Alternative approaches
+- Potential side effects
+
+### Command Safety Check
+
+Verify command safety before execution:
+
+```bash
+# Check if a command is safe
+nexus check "rm -rf /tmp/*"
+nexus check "curl http://example.com/script.sh | bash"
+
+# Interactive mode with additional warning
+nexus check --interactive "sudo chmod -R 777 /"
+```
+
+The check command provides:
+- Safety assessment (Safe / Caution / Dangerous)
+- Risk analysis
+- Safer alternatives
+- Best practices
+
+### Script Generation
+
+Generate production-ready scripts with best practices:
+
+```bash
+# Generate a bash script
+nexus script "backup MySQL database with compression and email notification"
+
+# Generate in specific language
+nexus script --language python "deploy application to production"
+
+# Save to file
+nexus script --output deploy.sh "deploy script with error handling"
+
+# With verbose output
+nexus script --verbose "monitor system resources and send alerts"
+```
+
+Generated scripts include:
+- Error handling (try/catch, exit codes)
+- Logging functionality
+- Input validation
+- Configuration options
+- Usage documentation
+- Best practices for the language
+
 ## Commands Reference
 
 | Command | Description |
 |---------|-------------|
 | `nexus ask <question>` | Ask a question (quotes optional, checks cache first) |
 | `nexus ask --verbose <question>` | Get verbose answer with full details |
+| `nexus debug <error>` | Debug an error message and get a solution (or pipe from stdin) |
+| `nexus explain <command>` | Explain what a command does in detail |
+| `nexus explain --file <file>` | Explain commands from a file |
+| `nexus explain --learn <command>` | Explain like I'm a beginner |
+| `nexus check <command>` | Check if a command is safe to run |
+| `nexus check --interactive <command>` | Check with interactive warning |
+| `nexus script <description>` | Generate a production-ready script |
+| `nexus script --language <lang> <description>` | Generate script in specific language |
+| `nexus script --output <file> <description>` | Save generated script to file |
 | `nexus save <category> <command>` | Save a command with category |
 | `nexus save --category <cat> <command>` | Save with category flag |
 | `nexus list [--category <cat>]` | List saved commands (optionally filtered) |
@@ -415,6 +519,57 @@ Rate limiting prevents hitting API limits and manages costs. Configure limits in
 
 Common questions are cached to reduce API calls. Cache settings are configurable in `config.yaml`.
 
+### Error Debugging
+
+When you encounter an error in your terminal, you can instantly debug it without leaving your workflow. The `nexus debug` command:
+
+- Analyzes error messages and provides specific solutions
+- Explains why the error occurred
+- Suggests fixes with step-by-step instructions
+- Can accept input from stdin (pipe errors directly)
+- Caches common errors for instant responses
+
+This eliminates the need to copy-paste errors into search engines or Stack Overflow, keeping you in your terminal workflow.
+
+### Command Explanation
+
+The `nexus explain` command helps you understand complex commands by breaking them down into digestible parts:
+
+- Detailed breakdown of each flag and argument
+- Explanation of what each part does
+- Common use cases and examples
+- Alternative approaches
+- Potential side effects to be aware of
+- Beginner-friendly mode with `--learn` flag
+
+Perfect for learning new tools, understanding existing scripts, or teaching others.
+
+### Command Safety Check
+
+Before running potentially dangerous commands, use `nexus check` to verify safety:
+
+- Analyzes commands for dangerous operations
+- Flags destructive operations (rm, chmod, etc.)
+- Checks for suspicious patterns (piping to bash, etc.)
+- Provides risk assessment (Safe / Caution / Dangerous)
+- Suggests safer alternatives
+- Interactive mode for additional warnings
+
+Helps prevent accidents and teaches best practices for command-line safety.
+
+### Script Generation
+
+Generate complete, production-ready scripts with `nexus script`:
+
+- Full scripts with error handling, not just commands
+- Includes logging, validation, and configuration
+- Follows language-specific best practices
+- Adds comments and documentation
+- Supports multiple languages (bash, python, etc.)
+- Can save directly to files
+
+Saves hours of boilerplate code and ensures your scripts follow best practices from the start.
+
 ## Database
 
 Commands, history, and cache are stored in SQLite at `~/.config/nexus/data/commands.db`.
@@ -482,10 +637,6 @@ nexus-cli-assistant/
 ├── venv/              # Virtual environment
 └── requirements.txt   # Dependencies
 ```
-
-### Running Tests
-
-(Add test instructions when tests are added)
 
 ## Contributing
 

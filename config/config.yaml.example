@@ -1,0 +1,40 @@
+# Nexus CLI Assistant Configuration
+# Copy this file to ~/.config/nexus/config.yaml and customize as needed
+
+ai_provider: ollama  # ollama, openai, anthropic, deepseek
+default_model: llama3.2
+output_mode: brief
+
+# Rate limiting settings
+rate_limiting:
+  enabled: true
+  requests_per_minute: 30
+  requests_per_hour: 500
+
+# Caching settings
+cache:
+  enabled: true
+  ttl_seconds: 3600  # 1 hour
+  max_entries: 1000
+
+providers:
+  ollama:
+    base_url: http://localhost:11434
+    model: llama3.2
+  
+  openai:
+    api_key: ${OPENAI_API_KEY}
+    model: gpt-4o-mini
+    rate_limit: 60  # requests per minute
+  
+  anthropic:
+    api_key: ${ANTHROPIC_API_KEY}
+    model: claude-3-5-sonnet-20241022
+    rate_limit: 50
+  
+  deepseek:
+    api_key: ${DEEPSEEK_API_KEY}
+    model: deepseek-chat
+    base_url: https://api.deepseek.com
+    rate_limit: 60
+

@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-01-06
+
+### Added
+- Structured output formatting with Commands and Explanation sections
+- Enhanced command parsing from AI responses (numbered lists, backticks, inline code)
+- Support for questions without quotes (automatic word joining)
+- Improved syntax highlighting for code blocks
+- Better visual presentation with bordered panels
+
+### Improved
+- Command extraction now handles multiple formats (numbered lists, backticks, code blocks)
+- Better pattern matching for command detection
+- Enhanced explanation formatting with markdown support
+
 ## [0.1.0] - 2024-01-06
 
 ### Added
@@ -24,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Virtual environment support
 - Installation script
 
-[Unreleased]: https://github.com/nexus-mike/Nexus-CLI-Assistant/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/nexus-mike/Nexus-CLI-Assistant/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/nexus-mike/Nexus-CLI-Assistant/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/nexus-mike/Nexus-CLI-Assistant/releases/tag/v0.1.0
 

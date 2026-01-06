@@ -19,8 +19,8 @@ cache:
 
 providers:
   ollama:
-    base_url: http://localhost:11434
-    model: llama3.2
+    base_url: http://localhost:11434  # Change if Ollama is in Docker with different port
+    model: llama3.2  # Use: ollama list to see available models
   
   openai:
     api_key: ${OPENAI_API_KEY}

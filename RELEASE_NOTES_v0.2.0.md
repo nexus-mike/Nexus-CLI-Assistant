@@ -1,0 +1,59 @@
+# Release Notes - v0.2.0
+
+## What's New
+
+### 🎨 Enhanced Output Formatting
+- **Structured Sections**: Answers now display in organized sections:
+  - 📋 **Commands**: Syntax-highlighted code blocks with all detected commands
+  - 💡 **Explanation**: Formatted markdown with full context
+- Beautiful bordered panels make answers stand out
+- Better visual hierarchy and readability
+
+### 🔍 Improved Command Detection
+- Automatically extracts commands from:
+  - Numbered lists (1. `docker ps`)
+  - Code blocks (```bash ... ```)
+  - Inline backticks (`docker ps`)
+  - Plain text command lines
+- Smarter pattern matching for better command recognition
+
+### 💬 Better Question Handling
+- **No quotes needed**: Ask questions naturally without quotes
+  - `nexus ask how to check docker status` ✅
+  - `nexus ask "how to check docker status"` ✅ (still works)
+- Automatic word joining for multi-word questions
+
+### 🎯 Other Improvements
+- Enhanced syntax highlighting for code blocks
+- Better markdown rendering in explanations
+- Improved error messages and user feedback
+
+## Installation
+
+Update from v0.1.0:
+```bash
+cd nexus-cli-assistant
+git pull
+source venv/bin/activate
+pip install -e .
+```
+
+Or fresh install:
+```bash
+git clone https://github.com/nexus-mike/Nexus-CLI-Assistant.git
+cd nexus-cli-assistant
+./scripts/install.sh
+```
+
+## Breaking Changes
+
+None - this is a backward-compatible update.
+
+## Contributors
+
+- Maikel van den Brink
+
+## Full Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for complete details.
+

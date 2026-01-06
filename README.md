@@ -258,7 +258,30 @@ Commands, history, and cache are stored in SQLite at `~/.config/nexus/data/comma
 
 If using Ollama, ensure it's running:
 ```bash
+# If running locally
 ollama serve
+
+# If running in Docker
+docker ps | grep ollama
+```
+
+### Ollama Model Not Found
+
+If you get a "model not found" error:
+
+1. Check available models:
+```bash
+ollama list
+# or if in Docker
+docker exec ollama-container ollama list
+```
+
+2. Update your config file `~/.config/nexus/config.yaml`:
+```yaml
+providers:
+  ollama:
+    base_url: http://localhost:11434
+    model: your-available-model-name  # Use exact name from ollama list
 ```
 
 ### API Key Issues

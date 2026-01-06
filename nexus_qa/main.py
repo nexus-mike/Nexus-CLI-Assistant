@@ -10,17 +10,24 @@ from nexus_qa.formatter import Formatter
 
 
 @click.group()
-@click.version_option(version="0.1.0")
+@click.version_option(version="0.2.0")
 def cli():
     """Nexus CLI Assistant - Quick AI-powered answers for Linux/Docker/Ollama questions."""
     pass
 
 
 @cli.command()
-@click.argument("question", required=True)
+@click.argument("question", nargs=-1, required=True)
 @click.option("--verbose", "-v", is_flag=True, help="Show verbose output")
-def ask(question: str, verbose: bool):
-    """Ask a question and get an AI-powered answer."""
+def ask(question: tuple, verbose: bool):
+    """Ask a question and get an AI-powered answer.
+    
+    You can provide the question with or without quotes.
+    Example: nexus ask how to check docker status
+    Example: nexus ask "how to check docker status"
+    """
+    # Join multiple arguments into a single question string
+    question_str = " ".join(question)
     try:
         config = load_config()
         storage = Storage()
@@ -39,17 +46,17 @@ def ask(question: str, verbose: bool):
         formatter = Formatter(verbose=verbose)
         
         # Check cache first
-        cached_response = cache.get(question, provider_name)
+        cached_response = cache.get(question_str, provider_name)
         from_cache = cached_response is not None
         
         if cached_response:
             response = cached_response
         else:
             # Ask AI
-            response = client.ask(question, verbose=verbose)
+            response = client.ask(question_str, verbose=verbose)
             
             # Save to history
-            storage.save_history(question, response, provider_name)
+            storage.save_history(question_str, response, provider_name)
         
         # Format and display
         formatter.format_response(response, from_cache=from_cache)

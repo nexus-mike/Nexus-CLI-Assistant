@@ -19,6 +19,7 @@ A lightweight CLI tool that provides quick AI-powered answers to Linux, Docker, 
 - 📖 **Command Explanation**: Understand complex commands with detailed breakdowns
 - 🛡️ **Safety Checks**: Verify command safety before execution
 - 📜 **Script Generation**: Generate production-ready scripts with best practices
+- 🔄 **Workflow Automation**: Automate repetitive tasks with pre-built workflow templates
 
 ## Installation
 
@@ -46,6 +47,7 @@ The script will:
 - Install all dependencies
 - Set up the `nexus` command
 - Create default configuration
+- Install workflow templates
 
 3. Activate the virtual environment:
 ```bash
@@ -433,6 +435,71 @@ Generated scripts include:
 - Usage documentation
 - Best practices for the language
 
+### Workflow Automation
+
+Automate repetitive system administration tasks with pre-built workflow templates:
+
+```bash
+# List available workflows
+nexus workflow list
+
+# Run a system health check
+nexus workflow run system-health
+
+# Run with verbose output
+nexus workflow run security-audit --verbose
+
+# Show workflow details
+nexus workflow show docker-health
+
+# Create a custom workflow from template
+nexus workflow create my-check --from-template system-health
+```
+
+#### Available Workflow Templates
+
+The following templates are automatically installed:
+
+- **system-health** - Quick system health overview (disk, memory, CPU, services)
+- **security-audit** - Security-focused checks (updates, failed logins, ports, firewall)
+- **performance-check** - System performance metrics (top processes, I/O, network stats)
+- **docker-health** - Docker and container status checks
+- **network-diagnostics** - Network connectivity and configuration checks
+
+#### Creating Custom Workflows
+
+Workflows are YAML files that define a sequence of commands to execute. You can:
+
+1. **Create from template**: Copy and customize an existing template
+   ```bash
+   nexus workflow create my-workflow --from-template system-health
+   ```
+
+2. **Create from scratch**: Create an empty workflow and edit it
+   ```bash
+   nexus workflow create my-workflow
+   ```
+
+3. **Edit workflows**: Workflows are stored in `~/.config/nexus/workflows/user/`
+
+#### Workflow Features
+
+- **Sequential execution**: Commands run in order
+- **Error handling**: Continue on error or stop execution
+- **Output capture**: Capture and display command output
+- **Variable substitution**: Use `${VARIABLE}` in commands
+- **Conditional execution**: Run alternatives if commands fail
+- **Timeout protection**: Prevent commands from hanging
+- **Verbose mode**: See step-by-step progress
+
+Workflows are perfect for:
+- Daily system health checks
+- Security audits
+- Performance monitoring
+- Docker container management
+- Network diagnostics
+- Custom automation tasks
+
 ## Commands Reference
 
 | Command | Description |
@@ -456,6 +523,14 @@ Generated scripts include:
 | `nexus delete <id>` | Delete a saved command by ID |
 | `nexus config` | Show current configuration |
 | `nexus config --set-provider <provider>` | Set default AI provider |
+| `nexus workflow list` | List available workflows |
+| `nexus workflow list --all` | Show all workflows including templates |
+| `nexus workflow run <name>` | Run a workflow by name |
+| `nexus workflow run <name> --verbose` | Run workflow with verbose output |
+| `nexus workflow run <name> --var KEY=VALUE` | Run workflow with variables |
+| `nexus workflow show <name>` | Show workflow details |
+| `nexus workflow create <name>` | Create a new workflow |
+| `nexus workflow create <name> --from-template <template>` | Create workflow from template |
 
 ## Virtual Environment
 
@@ -570,6 +645,18 @@ Generate complete, production-ready scripts with `nexus script`:
 
 Saves hours of boilerplate code and ensures your scripts follow best practices from the start.
 
+### Workflow Automation
+
+Automate repetitive system administration tasks with pre-built workflow templates. Workflows allow you to:
+
+- **Chain commands**: Execute multiple commands in sequence
+- **Handle errors**: Configure how to handle failures (continue, stop, or use alternatives)
+- **Capture output**: Collect and display results from each step
+- **Use variables**: Substitute variables in commands for flexibility
+- **Schedule tasks**: Perfect for regular system checks and monitoring
+
+Workflow templates are automatically installed and ready to use. You can also create custom workflows for your specific needs.
+
 ## Database
 
 Commands, history, and cache are stored in SQLite at `~/.config/nexus/data/commands.db`.
@@ -631,7 +718,10 @@ nexus-cli-assistant/
 │   ├── formatter.py   # Output formatting
 │   ├── models.py      # Data models
 │   ├── cache.py       # Caching system
-│   └── rate_limiter.py # Rate limiting
+│   ├── rate_limiter.py # Rate limiting
+│   └── workflows/     # Workflow system
+│       ├── engine.py   # Workflow execution engine
+│       └── templates/  # Built-in workflow templates
 ├── config/            # Configuration examples
 ├── scripts/           # Installation scripts
 ├── venv/              # Virtual environment

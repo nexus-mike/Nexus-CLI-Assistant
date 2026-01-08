@@ -1,0 +1,45 @@
+name: "performance-check"
+version: "1.0.0"
+description: "System performance metrics including top processes, I/O stats, and network statistics"
+author: "Nexus CLI Assistant"
+category: "performance"
+tags:
+  - performance
+  - monitoring
+  - system
+  - ubuntu
+
+steps:
+  - name: "top-processes"
+    command: "ps aux --sort=-%cpu | head -10"
+    description: "Show top 10 processes by CPU usage"
+    capture_output: true
+    timeout: 5
+    
+  - name: "memory-processes"
+    command: "ps aux --sort=-%mem | head -10"
+    description: "Show top 10 processes by memory usage"
+    capture_output: true
+    timeout: 5
+    
+  - name: "io-stats"
+    command: "iostat -x 1 2 2>/dev/null || echo 'iostat not available'"
+    description: "Check I/O statistics"
+    capture_output: true
+    continue_on_error: true
+    timeout: 10
+    
+  - name: "network-stats"
+    command: "ss -s"
+    description: "Show network socket statistics"
+    capture_output: true
+    timeout: 5
+    
+  - name: "load-average"
+    command: "uptime"
+    description: "Check system load average"
+    capture_output: true
+    timeout: 5
+
+output_format: "summary"
+estimated_duration: "15-20 seconds"

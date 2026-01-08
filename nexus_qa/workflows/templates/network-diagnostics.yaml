@@ -1,0 +1,48 @@
+name: "network-diagnostics"
+version: "1.0.0"
+description: "Network connectivity and configuration checks"
+author: "Nexus CLI Assistant"
+category: "network"
+tags:
+  - network
+  - connectivity
+  - diagnostics
+  - ubuntu
+
+steps:
+  - name: "interface-status"
+    command: "ip addr show"
+    description: "Show network interface status"
+    capture_output: true
+    timeout: 5
+    
+  - name: "default-gateway"
+    command: "ip route show default"
+    description: "Show default gateway"
+    capture_output: true
+    timeout: 5
+    
+  - name: "dns-resolution"
+    command: "dig google.com +short 2>/dev/null || nslookup google.com 2>/dev/null | grep -A1 'Name:' || echo 'DNS resolution failed'"
+    description: "Test DNS resolution"
+    capture_output: true
+    continue_on_error: true
+    fail_if_empty: true
+    timeout: 10
+    
+  - name: "connectivity-test"
+    command: "ping -c 3 8.8.8.8 2>/dev/null || echo 'Ping failed'"
+    description: "Test internet connectivity"
+    capture_output: true
+    continue_on_error: true
+    fail_if_exit_code_nonzero: true
+    timeout: 10
+    
+  - name: "listening-ports"
+    command: "ss -tuln"
+    description: "List listening ports"
+    capture_output: true
+    timeout: 5
+
+output_format: "summary"
+estimated_duration: "20-30 seconds"

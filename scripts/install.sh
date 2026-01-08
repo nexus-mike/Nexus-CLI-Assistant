@@ -49,6 +49,8 @@ pip install -e "$PROJECT_DIR" --quiet
 CONFIG_DIR="$HOME/.config/nexus"
 mkdir -p "$CONFIG_DIR"
 mkdir -p "$CONFIG_DIR/data"
+mkdir -p "$CONFIG_DIR/workflows/templates"
+mkdir -p "$CONFIG_DIR/workflows/user"
 
 # Copy example config if it doesn't exist
 CONFIG_FILE="$CONFIG_DIR/config.yaml"
@@ -82,6 +84,38 @@ EOF
     fi
 else
     echo "✓ Configuration file already exists at $CONFIG_FILE"
+fi
+
+# Copy workflow templates if they don't exist
+echo "📋 Installing workflow templates..."
+TEMPLATES_SOURCE="$PROJECT_DIR/nexus_qa/workflows/templates"
+TEMPLATES_DEST="$CONFIG_DIR/workflows/templates"
+
+if [ -d "$TEMPLATES_SOURCE" ]; then
+    # Copy templates, but don't overwrite existing user customizations
+    template_count=0
+    for template in "$TEMPLATES_SOURCE"/*.yaml; do
+        if [ -f "$template" ]; then
+            template_name=$(basename "$template")
+            if [ ! -f "$TEMPLATES_DEST/$template_name" ]; then
+                cp "$template" "$TEMPLATES_DEST/"
+                template_count=$((template_count + 1))
+            fi
+        fi
+    done
+    
+    # Copy README if it exists
+    if [ -f "$TEMPLATES_SOURCE/README.md" ]; then
+        cp "$TEMPLATES_SOURCE/README.md" "$TEMPLATES_DEST/" 2>/dev/null || true
+    fi
+    
+    if [ $template_count -gt 0 ]; then
+        echo "✓ Installed $template_count workflow template(s)"
+    else
+        echo "✓ Workflow templates already installed"
+    fi
+else
+    echo "⚠ Workflow templates directory not found (this is normal for first-time setup)"
 fi
 
 # Function to detect user's shell

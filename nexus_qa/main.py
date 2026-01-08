@@ -8,10 +8,11 @@ from nexus_qa.cache import Cache
 from nexus_qa.rate_limiter import RateLimiter
 from nexus_qa.ai_client import create_client
 from nexus_qa.formatter import Formatter
+from nexus_qa.workflows.engine import WorkflowEngine
 
 
 @click.group()
-@click.version_option(version="0.2.0")
+@click.version_option(version="0.3.0")
 def cli():
     """Nexus CLI Assistant - Quick AI-powered answers for Linux/Docker/Ollama questions."""
     pass
@@ -539,6 +540,208 @@ Provide the complete script with all necessary components. Include comments expl
                 formatter.format_success(f"Script saved to: {output_file}")
             except Exception as e:
                 formatter.format_error(f"Error saving script to file: {str(e)}")
+        
+    except Exception as e:
+        formatter = Formatter()
+        formatter.format_error(str(e))
+
+
+@cli.group()
+def workflow():
+    """Workflow automation commands."""
+    pass
+
+
+@workflow.command("list")
+@click.option("--all", "-a", is_flag=True, help="Show all workflows including templates")
+def workflow_list(all: bool):
+    """List available workflows."""
+    try:
+        engine = WorkflowEngine()
+        workflows = engine.list_workflows()
+        
+        formatter = Formatter()
+        
+        if not workflows:
+            formatter.format_info("No workflows found.")
+            formatter.format_info("Use 'nexus workflow create' to create a new workflow.")
+            return
+        
+        # Separate templates and user workflows
+        templates = {k: v for k, v in workflows.items() if v['source'] == 'template'}
+        user_workflows = {k: v for k, v in workflows.items() if v['source'] == 'user'}
+        
+        if templates:
+            formatter.format_info("Available Workflow Templates:")
+            for name, info in sorted(templates.items()):
+                workflow = info['workflow']
+                formatter.format_info(f"  {name:20} - {workflow.description}")
+                if workflow.estimated_duration:
+                    formatter.format_info(f"    Duration: {workflow.estimated_duration}")
+        
+        if user_workflows:
+            if templates:
+                formatter.format_info("")
+            formatter.format_info("User Workflows:")
+            for name, info in sorted(user_workflows.items()):
+                workflow = info['workflow']
+                formatter.format_info(f"  {name:20} - {workflow.description}")
+        
+        if not all and templates:
+            formatter.format_info("")
+            formatter.format_info("Use 'nexus workflow list --all' to see all workflows.")
+        
+    except Exception as e:
+        formatter = Formatter()
+        formatter.format_error(str(e))
+
+
+@workflow.command("run")
+@click.argument("name", required=True)
+@click.option("--verbose", "-v", is_flag=True, help="Show verbose output")
+@click.option("--var", "variables", multiple=True, help="Set workflow variables (format: KEY=VALUE)")
+def workflow_run(name: str, verbose: bool, variables: tuple):
+    """Run a workflow by name."""
+    try:
+        engine = WorkflowEngine()
+        workflow = engine.load_workflow(name)
+        
+        if not workflow:
+            formatter = Formatter()
+            formatter.format_error(f"Workflow '{name}' not found.")
+            formatter.format_info("Use 'nexus workflow list' to see available workflows.")
+            return
+        
+        # Parse variables
+        var_dict = {}
+        for var in variables:
+            if '=' in var:
+                key, value = var.split('=', 1)
+                var_dict[key.strip()] = value.strip()
+        
+        # Execute workflow
+        execution = engine.execute_workflow(workflow, variables=var_dict, verbose=verbose)
+        
+        formatter = Formatter(verbose=verbose)
+        
+        # Display results
+        if execution.status == 'completed':
+            formatter.format_success(f"\n✓ Workflow '{name}' completed successfully")
+            if execution.output:
+                print("\n" + execution.output)
+        elif execution.status == 'failed':
+            formatter.format_error(f"\n✗ Workflow '{name}' failed")
+            if execution.error:
+                formatter.format_error(f"Error: {execution.error}")
+            if execution.output:
+                print("\n" + execution.output)
+        
+        # Show summary
+        duration = (execution.completed_at - execution.started_at).total_seconds() if execution.completed_at else 0
+        formatter.format_info(f"\nCompleted {execution.steps_completed}/{execution.total_steps} steps in {duration:.2f}s")
+        
+    except Exception as e:
+        formatter = Formatter()
+        formatter.format_error(str(e))
+
+
+@workflow.command("create")
+@click.argument("name", required=True)
+@click.option("--from-template", "-t", "template_name", help="Create from template")
+def workflow_create(name: str, template_name: str):
+    """Create a new workflow."""
+    try:
+        engine = WorkflowEngine()
+        formatter = Formatter()
+        
+        user_path = engine.user_dir / f"{name}.yaml"
+        
+        if user_path.exists():
+            formatter.format_error(f"Workflow '{name}' already exists at {user_path}")
+            return
+        
+        if template_name:
+            # Create from template
+            template = engine.load_workflow(template_name)
+            if not template:
+                formatter.format_error(f"Template '{template_name}' not found.")
+                formatter.format_info("Use 'nexus workflow list' to see available templates.")
+                return
+            
+            # Copy template to user directory
+            import yaml
+            template_data = {
+                'name': name,
+                'version': template.version,
+                'description': f"Custom workflow based on {template_name}",
+                'author': template.author,
+                'category': template.category,
+                'tags': template.tags,
+                'steps': [step.dict() for step in template.steps],
+                'output_format': template.output_format,
+                'estimated_duration': template.estimated_duration,
+                'variables': template.variables
+            }
+            
+            with open(user_path, 'w', encoding='utf-8') as f:
+                yaml.dump(template_data, f, default_flow_style=False, sort_keys=False)
+            
+            formatter.format_success(f"Workflow '{name}' created from template '{template_name}'")
+            formatter.format_info(f"Location: {user_path}")
+            formatter.format_info("You can now edit this file to customize it.")
+        else:
+            # Create empty workflow
+            import yaml
+            empty_workflow = {
+                'name': name,
+                'version': '1.0.0',
+                'description': 'Custom workflow',
+                'category': 'general',
+                'tags': [],
+                'steps': [],
+                'output_format': 'summary'
+            }
+            
+            with open(user_path, 'w', encoding='utf-8') as f:
+                yaml.dump(empty_workflow, f, default_flow_style=False, sort_keys=False)
+            
+            formatter.format_success(f"Empty workflow '{name}' created")
+            formatter.format_info(f"Location: {user_path}")
+            formatter.format_info("Edit this file to add steps.")
+        
+    except Exception as e:
+        formatter = Formatter()
+        formatter.format_error(str(e))
+
+
+@workflow.command("show")
+@click.argument("name", required=True)
+def workflow_show(name: str):
+    """Show workflow details."""
+    try:
+        engine = WorkflowEngine()
+        workflow = engine.load_workflow(name)
+        
+        if not workflow:
+            formatter = Formatter()
+            formatter.format_error(f"Workflow '{name}' not found.")
+            return
+        
+        formatter = Formatter()
+        formatter.format_info(f"Workflow: {workflow.name}")
+        formatter.format_info(f"Description: {workflow.description}")
+        formatter.format_info(f"Category: {workflow.category}")
+        if workflow.tags:
+            formatter.format_info(f"Tags: {', '.join(workflow.tags)}")
+        if workflow.estimated_duration:
+            formatter.format_info(f"Estimated Duration: {workflow.estimated_duration}")
+        formatter.format_info(f"\nSteps ({len(workflow.steps)}):")
+        
+        for i, step in enumerate(workflow.steps, 1):
+            formatter.format_info(f"  {i}. {step.name}")
+            if step.description:
+                formatter.format_info(f"     {step.description}")
+            formatter.format_info(f"     Command: {step.command}")
         
     except Exception as e:
         formatter = Formatter()

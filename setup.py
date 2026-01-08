@@ -8,12 +8,19 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="nexus-cli-assistant",
-    version="0.2.0",
+    version="0.3.0",
     author="Maikel van den Brink",
     description="A lightweight CLI tool for quick AI-powered answers to Linux/Docker/Ollama questions",
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=find_packages(),
+    package_data={
+        'nexus_qa': [
+            'workflows/templates/*.yaml',
+            'workflows/templates/README.md',
+        ],
+    },
+    include_package_data=True,
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",

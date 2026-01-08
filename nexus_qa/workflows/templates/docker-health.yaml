@@ -1,0 +1,50 @@
+name: "docker-health"
+version: "1.0.0"
+description: "Docker and container status checks"
+author: "Nexus CLI Assistant"
+category: "docker"
+tags:
+  - docker
+  - containers
+  - monitoring
+  - ubuntu
+
+steps:
+  - name: "docker-version"
+    command: "docker --version"
+    description: "Check Docker version"
+    capture_output: true
+    continue_on_error: true
+    timeout: 5
+    
+  - name: "docker-status"
+    command: "systemctl is-active docker 2>/dev/null || echo 'Docker service not found'"
+    description: "Check if Docker service is running"
+    capture_output: true
+    continue_on_error: true
+    fail_if_output_contains: "inactive"
+    timeout: 5
+    
+  - name: "running-containers"
+    command: "docker ps 2>/dev/null || echo 'Docker not available'"
+    description: "List running containers"
+    capture_output: true
+    continue_on_error: true
+    timeout: 5
+    
+  - name: "container-stats"
+    command: "docker stats --no-stream 2>/dev/null || echo 'No containers running'"
+    description: "Show container resource usage"
+    capture_output: true
+    continue_on_error: true
+    timeout: 10
+    
+  - name: "docker-disk-usage"
+    command: "docker system df 2>/dev/null || echo 'Docker not available'"
+    description: "Check Docker disk usage"
+    capture_output: true
+    continue_on_error: true
+    timeout: 5
+
+output_format: "summary"
+estimated_duration: "15-25 seconds"

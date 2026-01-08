@@ -1,0 +1,46 @@
+name: "system-health"
+version: "1.0.0"
+description: "Quick system health overview - checks disk, memory, CPU, and services"
+author: "Nexus CLI Assistant"
+category: "system"
+tags:
+  - system
+  - health
+  - monitoring
+  - ubuntu
+
+steps:
+  - name: "disk-usage"
+    command: "df -h /"
+    description: "Check root filesystem disk usage"
+    capture_output: true
+    continue_on_error: false
+    timeout: 5
+    
+  - name: "memory-usage"
+    command: "free -h"
+    description: "Check memory usage"
+    capture_output: true
+    timeout: 5
+    
+  - name: "cpu-load"
+    command: "uptime"
+    description: "Check system load average"
+    capture_output: true
+    timeout: 5
+    
+  - name: "running-services"
+    command: "systemctl list-units --type=service --state=running | head -10"
+    description: "List top 10 running services"
+    capture_output: true
+    timeout: 5
+    
+  - name: "failed-services"
+    command: "systemctl list-units --type=service --state=failed"
+    description: "Check for failed services"
+    capture_output: true
+    warn_on_output: true
+    timeout: 5
+
+output_format: "summary"
+estimated_duration: "10-15 seconds"

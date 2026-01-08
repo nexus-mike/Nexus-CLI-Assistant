@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-01-08
+
+### Added
+- **Workflow Automation System**: Automate repetitive system administration tasks
+  - Pre-built workflow templates for common tasks (system-health, security-audit, performance-check, docker-health, network-diagnostics)
+  - `nexus workflow list` - List available workflows
+  - `nexus workflow run <name>` - Execute workflows with verbose output support
+  - `nexus workflow create <name>` - Create custom workflows
+  - `nexus workflow show <name>` - Show workflow details
+  - `nexus workflow create --from-template` - Create workflows from templates
+- Workflow templates automatically installed during setup
+- Support for workflow variables and conditional execution
+- Error handling with continue-on-error and alternative commands
+- Output capture and formatting for workflow steps
+- User workflow directory for custom workflows (`~/.config/nexus/workflows/user/`)
+
+### Improved
+- Installation script now installs workflow templates automatically
+- Package includes workflow templates as package data
+- Enhanced documentation with workflow examples
+
 ## [0.2.0] - 2025-01-06
 
 ### Added
@@ -41,7 +62,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Virtual environment support
 - Installation script
 
-[Unreleased]: https://github.com/nexus-mike/Nexus-CLI-Assistant/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/nexus-mike/Nexus-CLI-Assistant/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/nexus-mike/Nexus-CLI-Assistant/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/nexus-mike/Nexus-CLI-Assistant/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/nexus-mike/Nexus-CLI-Assistant/releases/tag/v0.1.0
 

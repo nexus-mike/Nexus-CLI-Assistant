@@ -1,0 +1,54 @@
+name: "security-audit"
+version: "1.0.0"
+description: "Security-focused system checks including updates, failed logins, open ports, and firewall status"
+author: "Nexus CLI Assistant"
+category: "security"
+tags:
+  - security
+  - audit
+  - firewall
+  - ubuntu
+
+steps:
+  - name: "check-updates"
+    command: "apt list --upgradable 2>/dev/null | grep -v 'Listing...'"
+    description: "Check for available system updates"
+    capture_output: true
+    warn_on_output: true
+    timeout: 10
+    
+  - name: "check-failed-logins"
+    command: "lastb | head -20"
+    description: "Check recent failed login attempts"
+    capture_output: true
+    timeout: 5
+    
+  - name: "check-open-ports"
+    command: "ss -tuln | grep LISTEN"
+    description: "Check listening ports"
+    capture_output: true
+    timeout: 5
+    
+  - name: "check-sudo-users"
+    command: "getent group sudo | cut -d: -f4"
+    description: "List users with sudo privileges"
+    capture_output: true
+    timeout: 5
+    
+  - name: "check-firewall"
+    command: "ufw status verbose"
+    description: "Check UFW firewall status"
+    capture_output: true
+    continue_on_error: true
+    alternative: "iptables -L -n -v"
+    timeout: 5
+    
+  - name: "check-ssh-config"
+    command: "grep -E '^PermitRootLogin|^PasswordAuthentication' /etc/ssh/sshd_config 2>/dev/null || echo 'SSH config not accessible'"
+    description: "Check SSH security configuration"
+    capture_output: true
+    continue_on_error: true
+    timeout: 5
+
+output_format: "summary"
+estimated_duration: "20-30 seconds"

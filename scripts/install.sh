@@ -84,15 +84,121 @@ else
     echo "✓ Configuration file already exists at $CONFIG_FILE"
 fi
 
+# Function to detect user's shell
+detect_shell() {
+    if [ -n "$ZSH_VERSION" ]; then
+        echo "zsh"
+    elif [ -n "$BASH_VERSION" ]; then
+        echo "bash"
+    elif [ -n "$FISH_VERSION" ]; then
+        echo "fish"
+    else
+        # Fallback: check $SHELL environment variable
+        basename "$SHELL" 2>/dev/null || echo "bash"
+    fi
+}
+
+# Function to get shell config file path
+get_shell_config() {
+    local shell_type="$1"
+    case "$shell_type" in
+        zsh)
+            echo "$HOME/.zshrc"
+            ;;
+        bash)
+            if [ -f "$HOME/.bash_profile" ]; then
+                echo "$HOME/.bash_profile"
+            else
+                echo "$HOME/.bashrc"
+            fi
+            ;;
+        fish)
+            echo "$HOME/.config/fish/config.fish"
+            ;;
+        *)
+            echo "$HOME/.bashrc"
+            ;;
+    esac
+}
+
+# Function to check if nexus alias/config already exists
+nexus_alias_exists() {
+    local config_file="$1"
+    if [ ! -f "$config_file" ]; then
+        return 1
+    fi
+    grep -q "nexus.*venv.*activate" "$config_file" 2>/dev/null || \
+    grep -q "alias nexus=" "$config_file" 2>/dev/null || \
+    grep -q "# Nexus CLI Assistant" "$config_file" 2>/dev/null
+}
+
+# Function to add nexus alias to shell config
+add_nexus_alias() {
+    local config_file="$1"
+    local shell_type="$2"
+    
+    # Create config file if it doesn't exist
+    mkdir -p "$(dirname "$config_file")"
+    touch "$config_file"
+    
+    # Check if already exists
+    if nexus_alias_exists "$config_file"; then
+        echo "⚠ Nexus alias already exists in $config_file"
+        echo "   Skipping alias setup. If you need to update it, edit the file manually."
+        return 1
+    fi
+    
+    # Add alias based on shell type
+    {
+        echo ""
+        echo "# Nexus CLI Assistant - Auto-configured by installer"
+        if [ "$shell_type" = "fish" ]; then
+            echo "alias nexus='source $VENV_DIR/bin/activate.fish; and nexus'"
+        else
+            echo "alias nexus='source $VENV_DIR/bin/activate && nexus'"
+        fi
+    } >> "$config_file"
+    
+    return 0
+}
+
+# Ask user about automatic setup
+echo ""
+echo "🔧 Command Setup"
+echo "Would you like to configure the 'nexus' command to work without manually activating the virtual environment?"
+echo ""
+echo "Options:"
+echo "  1) User-specific (recommended) - Adds alias to your shell config file"
+echo "  2) Skip - You'll need to activate venv manually or add alias yourself"
+echo ""
+read -p "Choose option [1/2] (default: 1): " setup_choice
+setup_choice=${setup_choice:-1}
+
+if [ "$setup_choice" = "1" ]; then
+    SHELL_TYPE=$(detect_shell)
+    SHELL_CONFIG=$(get_shell_config "$SHELL_TYPE")
+    
+    echo ""
+    echo "📝 Detected shell: $SHELL_TYPE"
+    echo "📝 Config file: $SHELL_CONFIG"
+    
+    if add_nexus_alias "$SHELL_CONFIG" "$SHELL_TYPE"; then
+        echo "✓ Added nexus alias to $SHELL_CONFIG"
+        echo ""
+        echo "⚠️  IMPORTANT: To use the 'nexus' command in this session, run:"
+        echo "   source $SHELL_CONFIG"
+        echo ""
+        echo "   Or open a new terminal window for the changes to take effect."
+    fi
+else
+    echo "⏭️  Skipping automatic setup."
+    echo ""
+    echo "To set up manually later, add to your shell config:"
+    echo "  alias nexus='source $VENV_DIR/bin/activate && nexus'"
+fi
+
 echo ""
 echo "✅ Installation complete!"
-echo ""
-echo "To use Nexus CLI Assistant:"
-echo "  1. Activate the virtual environment: source $VENV_DIR/bin/activate"
-echo "  2. Run: nexus ask 'your question here'"
-echo ""
-echo "Or add to your ~/.bashrc or ~/.zshrc:"
-echo "  alias nexus='source $VENV_DIR/bin/activate && nexus'"
 echo ""
 echo "Configuration file: $CONFIG_FILE"
 echo ""

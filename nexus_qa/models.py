@@ -78,6 +78,7 @@ class WorkflowStep(BaseModel):
     name: str
     command: str
     description: Optional[str] = None
+    shell: bool = False
     capture_output: bool = True
     continue_on_error: bool = False
     timeout: Optional[int] = 30
@@ -115,4 +116,3 @@ class WorkflowExecution(BaseModel):
     total_steps: int = 0
     output: Optional[str] = None
     error: Optional[str] = None
-

@@ -1,0 +1,49 @@
+name: "ai-model-benchmark"
+version: "1.0.0"
+description: "Benchmark AI model performance by testing response times and quality"
+author: "Nexus CLI Assistant"
+category: "ai"
+tags:
+  - ai
+  - benchmark
+  - performance
+  - testing
+
+steps:
+  - name: "check-ollama-status"
+    command: "curl -s http://localhost:11434/api/tags 2>/dev/null | head -1 || echo 'Ollama not running'"
+    description: "Check if Ollama is running and accessible"
+    capture_output: true
+    continue_on_error: true
+    timeout: 5
+    
+  - name: "list-ollama-models"
+    command: "ollama list 2>/dev/null || echo 'Ollama not available'"
+    description: "List available Ollama models"
+    capture_output: true
+    continue_on_error: true
+    timeout: 5
+    
+  - name: "test-model-response-time"
+    command: "time (echo 'What is 2+2?' | ollama run llama3.2 2>/dev/null | head -5) 2>&1 | grep real || echo 'Model test failed'"
+    description: "Test model response time (if Ollama available)"
+    capture_output: true
+    continue_on_error: true
+    timeout: 30
+    
+  - name: "check-api-keys"
+    command: "echo 'API Keys:' && [ -n \"$OPENAI_API_KEY\" ] && echo '  OpenAI: Set' || echo '  OpenAI: Not set' && [ -n \"$ANTHROPIC_API_KEY\" ] && echo '  Anthropic: Set' || echo '  Anthropic: Not set' && [ -n \"$DEEPSEEK_API_KEY\" ] && echo '  DeepSeek: Set' || echo '  DeepSeek: Not set'"
+    description: "Check which AI provider API keys are configured"
+    capture_output: true
+    timeout: 5
+    
+  - name: "nexus-config-status"
+    command: "nexus config 2>/dev/null | grep -E 'AI Provider|Default Model' || echo 'Nexus CLI not available'"
+    description: "Check current Nexus CLI AI provider configuration"
+    capture_output: true
+    continue_on_error: true
+    timeout: 5
+
+output_format: "summary"
+estimated_duration: "30-60 seconds"
+notes: "This workflow helps you understand which AI models are available and configured. For actual benchmarking, you may want to run multiple queries and measure average response times."

@@ -1,0 +1,51 @@
+name: "log-analysis"
+version: "1.0.0"
+description: "Analyze system logs for errors, warnings, and important events"
+author: "Nexus CLI Assistant"
+category: "monitoring"
+tags:
+  - logs
+  - analysis
+  - errors
+  - monitoring
+  - ubuntu
+
+steps:
+  - name: "recent-errors"
+    command: "journalctl -p err -n 20 --no-pager 2>/dev/null || tail -50 /var/log/syslog 2>/dev/null | grep -i error || echo 'No recent errors found'"
+    description: "Show recent error-level log entries"
+    capture_output: true
+    continue_on_error: true
+    timeout: 5
+    
+  - name: "recent-warnings"
+    command: "journalctl -p warning -n 20 --no-pager 2>/dev/null || tail -50 /var/log/syslog 2>/dev/null | grep -i warning || echo 'No recent warnings found'"
+    description: "Show recent warning-level log entries"
+    capture_output: true
+    continue_on_error: true
+    timeout: 5
+    
+  - name: "failed-services"
+    command: "journalctl -p err --since '1 hour ago' --no-pager | grep -i 'failed\\|error' | head -10 || echo 'No service failures in last hour'"
+    description: "Check for failed services in the last hour"
+    capture_output: true
+    continue_on_error: true
+    timeout: 5
+    
+  - name: "auth-failures"
+    command: "grep -i 'failed\\|invalid\\|authentication' /var/log/auth.log 2>/dev/null | tail -10 || journalctl -u ssh -n 20 --no-pager 2>/dev/null | grep -i 'failed' || echo 'No auth log accessible'"
+    description: "Check for authentication failures"
+    capture_output: true
+    continue_on_error: true
+    timeout: 5
+    
+  - name: "disk-space-logs"
+    command: "du -sh /var/log 2>/dev/null && find /var/log -name '*.log' -size +100M 2>/dev/null | head -5 || echo 'Log directory not accessible'"
+    description: "Check log directory size and large log files"
+    capture_output: true
+    continue_on_error: true
+    timeout: 10
+
+output_format: "summary"
+estimated_duration: "15-25 seconds"
+notes: "Review the output for patterns. Large log files may need rotation. Frequent errors may indicate system issues."

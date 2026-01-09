@@ -1,0 +1,54 @@
+name: "package-updates"
+version: "1.0.0"
+description: "Check for available system and package updates"
+author: "Nexus CLI Assistant"
+category: "maintenance"
+tags:
+  - updates
+  - packages
+  - apt
+  - maintenance
+  - ubuntu
+
+steps:
+  - name: "update-package-list"
+    command: "sudo apt update 2>&1 | tail -5 || echo 'Package list update requires sudo'"
+    description: "Update package list (requires sudo)"
+    capture_output: true
+    continue_on_error: true
+    requires_root: false
+    skip_if_no_permission: true
+    timeout: 30
+    
+  - name: "available-updates"
+    command: "apt list --upgradable 2>/dev/null | grep -v 'Listing...' | head -20 || echo 'No updates available or apt list failed'"
+    description: "List available package updates"
+    capture_output: true
+    continue_on_error: true
+    timeout: 10
+    
+  - name: "security-updates"
+    command: "apt list --upgradable 2>/dev/null | grep -i security | head -10 || echo 'No security updates or check failed'"
+    description: "Check for security updates"
+    capture_output: true
+    continue_on_error: true
+    warn_on_output: true
+    timeout: 10
+    
+  - name: "kernel-updates"
+    command: "apt list --upgradable 2>/dev/null | grep -E 'linux-image|linux-headers' | head -5 || echo 'No kernel updates available'"
+    description: "Check for kernel updates"
+    capture_output: true
+    continue_on_error: true
+    timeout: 10
+    
+  - name: "update-summary"
+    command: "apt list --upgradable 2>/dev/null | wc -l && echo 'packages can be upgraded' || echo 'Unable to count updates'"
+    description: "Count total available updates"
+    capture_output: true
+    continue_on_error: true
+    timeout: 10
+
+output_format: "summary"
+estimated_duration: "30-60 seconds"
+notes: "Review updates before applying. Use 'sudo apt upgrade' to apply updates. Security updates are recommended to apply promptly."

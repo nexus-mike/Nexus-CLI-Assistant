@@ -1,0 +1,64 @@
+name: "disk-cleanup"
+version: "1.0.0"
+description: "Identify disk space usage and cleanup opportunities"
+author: "Nexus CLI Assistant"
+category: "maintenance"
+tags:
+  - disk
+  - cleanup
+  - maintenance
+  - storage
+  - ubuntu
+
+steps:
+  - name: "disk-usage-overview"
+    command: "df -h"
+    description: "Show disk usage for all filesystems"
+    capture_output: true
+    timeout: 5
+    
+  - name: "largest-directories"
+    command: "du -h --max-depth=1 / 2>/dev/null | sort -hr | head -10 || du -h --max-depth=1 ~ 2>/dev/null | sort -hr | head -10"
+    description: "Find largest directories (root or home)"
+    capture_output: true
+    continue_on_error: true
+    timeout: 10
+    
+  - name: "docker-disk-usage"
+    command: "docker system df 2>/dev/null || echo 'Docker not available'"
+    description: "Check Docker disk usage"
+    capture_output: true
+    continue_on_error: true
+    timeout: 5
+    
+  - name: "apt-cache-size"
+    command: "du -sh /var/cache/apt/archives 2>/dev/null || echo 'APT cache not accessible'"
+    description: "Check APT package cache size"
+    capture_output: true
+    continue_on_error: true
+    timeout: 5
+    
+  - name: "log-files-size"
+    command: "du -sh /var/log 2>/dev/null || echo 'Log directory not accessible'"
+    description: "Check log files directory size"
+    capture_output: true
+    continue_on_error: true
+    timeout: 5
+    
+  - name: "large-files"
+    command: "find / -type f -size +100M 2>/dev/null | head -10 || find ~ -type f -size +100M 2>/dev/null | head -10"
+    description: "Find files larger than 100MB"
+    capture_output: true
+    continue_on_error: true
+    timeout: 30
+    
+  - name: "old-kernels"
+    command: "dpkg -l | grep -E 'linux-image|linux-headers' | grep -v $(uname -r) | wc -l"
+    description: "Count old kernel packages (can be removed)"
+    capture_output: true
+    continue_on_error: true
+    timeout: 5
+
+output_format: "summary"
+estimated_duration: "30-60 seconds"
+notes: "Review the output carefully before deleting anything. Some cleanup commands: 'sudo apt autoremove' (old kernels), 'sudo apt clean' (APT cache), 'docker system prune' (Docker cleanup)."

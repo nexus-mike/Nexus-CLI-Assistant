@@ -1,0 +1,48 @@
+name: "service-status"
+version: "1.0.0"
+description: "Check status of important system services"
+author: "Nexus CLI Assistant"
+category: "monitoring"
+tags:
+  - services
+  - systemd
+  - monitoring
+  - ubuntu
+
+steps:
+  - name: "all-services-status"
+    command: "systemctl list-units --type=service --state=running | head -15"
+    description: "List running services"
+    capture_output: true
+    timeout: 5
+    
+  - name: "failed-services"
+    command: "systemctl list-units --type=service --state=failed"
+    description: "Check for failed services"
+    capture_output: true
+    warn_on_output: true
+    timeout: 5
+    
+  - name: "important-services"
+    command: "for svc in ssh docker nginx apache2 mysql postgresql; do systemctl is-active $svc 2>/dev/null && echo \"$svc: active\" || echo \"$svc: inactive/not installed\"; done"
+    description: "Check status of common important services"
+    capture_output: true
+    timeout: 10
+    
+  - name: "service-errors"
+    command: "systemctl list-units --type=service --state=failed,error | grep -v '0 loaded units' || echo 'No services in failed/error state'"
+    description: "Check for services in error state"
+    capture_output: true
+    warn_on_output: true
+    timeout: 5
+    
+  - name: "recent-service-changes"
+    command: "journalctl --since '1 hour ago' -u '*' --no-pager 2>/dev/null | grep -E 'Started|Stopped|Failed' | tail -10 || echo 'No recent service changes'"
+    description: "Check recent service state changes"
+    capture_output: true
+    continue_on_error: true
+    timeout: 5
+
+output_format: "summary"
+estimated_duration: "15-25 seconds"
+notes: "Failed services should be investigated. Use 'systemctl status SERVICE_NAME' for detailed information."

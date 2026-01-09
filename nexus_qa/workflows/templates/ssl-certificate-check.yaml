@@ -1,0 +1,42 @@
+name: "ssl-certificate-check"
+version: "1.0.0"
+description: "Check SSL/TLS certificate status and expiration dates"
+author: "Nexus CLI Assistant"
+category: "security"
+tags:
+  - ssl
+  - tls
+  - certificate
+  - security
+  - web
+
+steps:
+  - name: "check-certificate-tool"
+    command: "which openssl || which gnutls-cli || echo 'No SSL tool found'"
+    description: "Check if SSL certificate checking tools are available"
+    capture_output: true
+    timeout: 5
+    
+  - name: "example-google-cert"
+    command: "echo | openssl s_client -connect google.com:443 -servername google.com 2>/dev/null | openssl x509 -noout -dates 2>/dev/null || echo 'Certificate check failed'"
+    description: "Check example certificate (google.com) to verify tool works"
+    capture_output: true
+    continue_on_error: true
+    timeout: 10
+    
+  - name: "local-certificates"
+    command: "find /etc/ssl/certs -name '*.crt' 2>/dev/null | head -5 || echo 'No local certificates found'"
+    description: "List local certificate files"
+    capture_output: true
+    continue_on_error: true
+    timeout: 5
+    
+  - name: "certificate-expiry-info"
+    command: "echo 'To check a specific domain, use:' && echo '  echo | openssl s_client -connect DOMAIN:443 -servername DOMAIN 2>/dev/null | openssl x509 -noout -dates'"
+    description: "Show how to check certificate expiration"
+    capture_output: true
+    timeout: 5
+
+output_format: "summary"
+estimated_duration: "10-20 seconds"
+notes: "This workflow checks SSL certificate tools. To check specific domains, modify the commands or create a custom workflow with your domain names."

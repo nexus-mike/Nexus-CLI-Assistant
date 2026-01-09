@@ -1,6 +1,7 @@
 """Workflow execution engine for Nexus CLI Assistant."""
 
 import subprocess
+import shlex
 import yaml
 from pathlib import Path
 from typing import Optional, Dict, List, Any
@@ -122,11 +123,14 @@ class WorkflowEngine:
         """Execute a single workflow step."""
         if variables is None:
             variables = {}
-        
+
         # Substitute variables in command
         command = step.command
         for key, value in variables.items():
-            command = command.replace(f"${{{key}}}", str(value))
+            replacement = str(value)
+            if step.shell:
+                replacement = shlex.quote(replacement)
+            command = command.replace(f"${{{key}}}", replacement)
         
         result = {
             'step_name': step.name,
@@ -153,9 +157,22 @@ class WorkflowEngine:
             
             # Execute command
             timeout = step.timeout or 30
+            if step.shell:
+                argv = command
+                shell = True
+            else:
+                try:
+                    argv = shlex.split(command)
+                except ValueError as exc:
+                    result['error'] = f"Failed to parse command: {exc}"
+                    return result
+                if not argv:
+                    result['error'] = "Command is empty after parsing"
+                    return result
+                shell = False
             process = subprocess.run(
-                command,
-                shell=True,
+                argv,
+                shell=shell,
                 capture_output=True,
                 text=True,
                 timeout=timeout,
@@ -265,7 +282,8 @@ class WorkflowEngine:
                             description=step.description,
                             capture_output=step.capture_output,
                             continue_on_error=True,
-                            timeout=step.timeout
+                            timeout=step.timeout,
+                            shell=step.shell
                         )
                         alt_result = self.execute_step(alt_step, all_variables)
                         if alt_result['success']:

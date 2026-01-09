@@ -107,6 +107,7 @@ steps:
   - name: "step-name"
     command: "command to run"
     description: "What this step does"
+    shell: false
     capture_output: true
     continue_on_error: false
     timeout: 5
@@ -114,6 +115,13 @@ steps:
 output_format: "summary"
 estimated_duration: "10-15 seconds"
 ```
+
+### Shell execution
+
+By default, workflow steps run without a shell (`shell: false`). If you need shell features
+like pipes or redirection, explicitly set `shell: true` on the step. When shell execution
+is enabled, variable substitutions are escaped with `shlex.quote(...)` before being injected
+into the command to reduce the risk of unintended command execution.
 
 ## Updating Templates
 

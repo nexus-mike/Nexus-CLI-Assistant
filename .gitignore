@@ -9,6 +9,8 @@ docs-private/
 
 # Test files (local developer use only)
 tests/
+!nexus_qa/tests/
+!nexus_qa/tests/**
 run_tests.py
 *.pyc
 .pytest_cache/
@@ -63,4 +65,3 @@ config/config.yaml
 
 # Logs
 *.log
-

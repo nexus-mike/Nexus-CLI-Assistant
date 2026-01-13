@@ -20,6 +20,7 @@ A lightweight CLI tool that provides quick AI-powered answers to Linux, Docker, 
 - 🛡️ **Safety Checks**: Verify command safety before execution
 - 📜 **Script Generation**: Generate production-ready scripts with best practices
 - 🔄 **Workflow Automation**: Automate repetitive tasks with pre-built workflow templates
+- 🎬 **YouTube Transcription**: Transcribe YouTube videos to text using local Whisper AI
 
 ## Installation
 
@@ -656,6 +657,69 @@ Automate repetitive system administration tasks with pre-built workflow template
 - **Schedule tasks**: Perfect for regular system checks and monitoring
 
 Workflow templates are automatically installed and ready to use. You can also create custom workflows for your specific needs.
+
+### YouTube Transcription
+
+Transcribe YouTube videos to text using local AI (Whisper) for privacy-first video analysis. Perfect for:
+- Creating searchable transcripts of technical videos
+- Analyzing tutorial content with AI
+- Extracting information from conference talks
+- Documenting video content
+
+```bash
+# Transcribe a YouTube video (default: base model)
+nexus transcribe url "https://www.youtube.com/watch?v=VIDEO_ID"
+
+# Use a specific Whisper model size
+nexus transcribe url VIDEO_URL --model-size small
+
+# Save to custom directory
+nexus transcribe url VIDEO_URL --output-dir ~/my-transcriptions
+
+# List all transcriptions
+nexus transcribe list
+
+# List with detailed information
+nexus transcribe list --verbose
+```
+
+#### Whisper Model Sizes
+
+Choose the right model based on your hardware and accuracy needs:
+
+| Model | RAM Required | Speed | Accuracy | Use Case |
+|-------|-------------|-------|----------|----------|
+| `tiny` | ~1 GB | Fastest | Basic | Quick transcriptions, testing |
+| `base` | ~1 GB | Fast | Good | **Default**, best balance |
+| `small` | ~2 GB | Medium | Better | Higher quality transcriptions |
+| `medium` | ~5 GB | Slower | High | Professional use |
+| `large` | ~10 GB | Slowest | Best | Maximum accuracy needed |
+
+#### Requirements
+
+Before using transcription, install ffmpeg:
+
+```bash
+sudo apt update
+sudo apt install -y ffmpeg
+```
+
+#### Output Format
+
+Transcriptions are saved as text files with metadata headers:
+- Location: `./transcriptions/` (configurable in config.yaml)
+- Filename: `{video_id}_{timestamp}.txt`
+- Contains: Video title, uploader, duration, and full transcript
+
+#### Configuration
+
+Add to `~/.config/nexus/config.yaml`:
+
+```yaml
+transcription:
+  output_dir: ./transcriptions  # Where to save transcriptions
+  default_model_size: base  # Default Whisper model
+```
 
 ## Database
 

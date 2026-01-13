@@ -12,7 +12,7 @@ from nexus_qa.workflows.engine import WorkflowEngine
 
 
 @click.group()
-@click.version_option(version="0.3.0")
+@click.version_option(version="0.4.0")
 def cli():
     """Nexus CLI Assistant - Quick AI-powered answers for Linux/Docker/Ollama questions."""
     pass
@@ -746,6 +746,134 @@ def workflow_show(name: str):
     except Exception as e:
         formatter = Formatter()
         formatter.format_error(str(e))
+
+
+@cli.group()
+def transcribe():
+    """YouTube video transcription commands."""
+    pass
+
+
+@transcribe.command("url")
+@click.argument("url")
+@click.option("--model-size", "-m", 
+              type=click.Choice(['tiny', 'base', 'small', 'medium', 'large']),
+              default='base',
+              help="Whisper model size (default: base)")
+@click.option("--output-dir", "-o",
+              type=click.Path(),
+              help="Custom output directory for transcriptions")
+def transcribe_url(url: str, model_size: str, output_dir: str):
+    """Transcribe a YouTube video to text.
+    
+    Examples:
+        nexus transcribe url "https://www.youtube.com/watch?v=VIDEO_ID"
+        nexus transcribe url VIDEO_URL --model-size small
+        nexus transcribe url VIDEO_URL -o ~/my-transcriptions
+    
+    Model sizes (larger = more accurate but slower):
+        - tiny: Fastest, least accurate (~1GB RAM)
+        - base: Good balance (default) (~1GB RAM)
+        - small: Better accuracy (~2GB RAM)
+        - medium: High accuracy (~5GB RAM)
+        - large: Best accuracy (~10GB RAM)
+    """
+    try:
+        from nexus_qa.transcriber import YouTubeTranscriber, TranscriptionError
+        from pathlib import Path
+        
+        # Determine output directory
+        if output_dir:
+            out_path = Path(output_dir)
+        else:
+            # Use config or default
+            try:
+                config = load_config()
+                if hasattr(config, 'transcription') and config.transcription.get('output_dir'):
+                    out_path = Path(config.transcription['output_dir'])
+                else:
+                    out_path = Path.cwd() / "transcriptions"
+            except:
+                out_path = Path.cwd() / "transcriptions"
+        
+        # Create transcriber
+        transcriber = YouTubeTranscriber(output_dir=out_path)
+        
+        # Transcribe
+        output_file, metadata = transcriber.transcribe(url, model_size=model_size)
+        
+        # Success message
+        formatter = Formatter()
+        formatter.format_success("Transcription complete!")
+        formatter.format_info(f"File: {output_file}")
+        formatter.format_info(f"Title: {metadata.get('title', 'N/A')}")
+        formatter.format_info(f"Duration: {metadata.get('duration', 'N/A')} seconds")
+        
+    except TranscriptionError as e:
+        formatter = Formatter()
+        formatter.format_error(str(e))
+        sys.exit(1)
+    except Exception as e:
+        formatter = Formatter()
+        formatter.format_error(f"Unexpected error: {e}")
+        sys.exit(1)
+
+
+@transcribe.command("list")
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed information")
+def transcribe_list(verbose: bool):
+    """List all transcriptions.
+    
+    Examples:
+        nexus transcribe list
+        nexus transcribe list --verbose
+    """
+    try:
+        from nexus_qa.transcriber import YouTubeTranscriber
+        from pathlib import Path
+        
+        # Get output directory from config or use default
+        try:
+            config = load_config()
+            if hasattr(config, 'transcription') and config.transcription.get('output_dir'):
+                out_path = Path(config.transcription['output_dir'])
+            else:
+                out_path = Path.cwd() / "transcriptions"
+        except:
+            out_path = Path.cwd() / "transcriptions"
+        
+        transcriber = YouTubeTranscriber(output_dir=out_path)
+        transcriptions = transcriber.list_transcriptions()
+        
+        if not transcriptions:
+            formatter = Formatter()
+            formatter.format_info("No transcriptions found.")
+            formatter.format_info(f"Transcriptions will be saved to: {out_path}")
+            return
+        
+        formatter = Formatter()
+        formatter.format_info(f"Found {len(transcriptions)} transcription(s):\n")
+        
+        for i, trans in enumerate(transcriptions, 1):
+            formatter.format_info(f"{i}. {trans.get('title', 'Unknown Title')}")
+            if verbose:
+                formatter.format_info(f"   File: {trans['file']}")
+                formatter.format_info(f"   Video ID: {trans.get('video_id', 'N/A')}")
+                formatter.format_info(f"   Duration: {trans.get('duration', 'N/A')}")
+                formatter.format_info(f"   Modified: {trans['modified'].strftime('%Y-%m-%d %H:%M:%S')}")
+                size_kb = trans['size'] / 1024
+                formatter.format_info(f"   Size: {size_kb:.1f} KB")
+                formatter.format_info("")
+            else:
+                formatter.format_info(f"   Modified: {trans['modified'].strftime('%Y-%m-%d %H:%M:%S')}")
+        
+        if not verbose:
+            formatter.format_info("\nUse --verbose for more details")
+        
+    except Exception as e:
+        formatter = Formatter()
+        formatter.format_error(str(e))
+        sys.exit(1)
 
 
 if __name__ == "__main__":

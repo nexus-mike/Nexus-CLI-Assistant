@@ -17,6 +17,11 @@ cache:
   ttl_seconds: 3600  # 1 hour
   max_entries: 1000
 
+# YouTube transcription settings
+transcription:
+  output_dir: ./transcriptions  # Directory to save transcriptions
+  default_model_size: base  # Whisper model: tiny, base, small, medium, large
+
 providers:
   ollama:
     base_url: http://localhost:11434  # Change if Ollama is in Docker with different port

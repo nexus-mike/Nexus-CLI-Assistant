@@ -8,7 +8,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="nexus-cli-assistant",
-    version="0.3.0",
+    version="0.4.0",
     author="Maikel van den Brink",
     description="A lightweight CLI tool for quick AI-powered answers to Linux/Docker/Ollama questions",
     long_description=long_description,

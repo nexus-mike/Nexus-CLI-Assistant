@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-01-13
+
+### Added
+- **YouTube Transcription Feature**: Transcribe YouTube videos to text using local Whisper AI
+  - `nexus transcribe url <url>` - Transcribe a YouTube video
+  - `nexus transcribe list` - List all transcriptions with metadata
+  - Support for 5 Whisper model sizes (tiny, base, small, medium, large)
+  - Privacy-first: All processing happens locally
+  - Progress indicators with Rich library for real-time feedback
+  - Metadata preservation (title, uploader, duration, upload date)
+  - Configurable output directory and default model size
+  - Automatic cleanup of temporary audio files
+- New dependencies: yt-dlp, openai-whisper, ffmpeg-python
+- Comprehensive transcription documentation in README
+- Model size comparison table and usage examples
+- `transcription` section in config.yaml for settings
+
+### Improved
+- Enhanced README with YouTube transcription feature documentation
+- Added ffmpeg installation instructions
+- Updated configuration examples with transcription settings
+
 ## [0.3.0] - 2025-01-08
 
 ### Added
@@ -62,7 +84,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Virtual environment support
 - Installation script
 
-[Unreleased]: https://github.com/nexus-mike/Nexus-CLI-Assistant/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/nexus-mike/Nexus-CLI-Assistant/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/nexus-mike/Nexus-CLI-Assistant/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/nexus-mike/Nexus-CLI-Assistant/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/nexus-mike/Nexus-CLI-Assistant/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/nexus-mike/Nexus-CLI-Assistant/releases/tag/v0.1.0

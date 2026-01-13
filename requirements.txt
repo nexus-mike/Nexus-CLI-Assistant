@@ -5,3 +5,7 @@ rich>=13.7.0
 pydantic>=2.5.0
 aiosqlite>=0.19.0
 
+# YouTube transcription dependencies
+yt-dlp>=2024.0.0
+openai-whisper>=20231117
+ffmpeg-python>=0.2.0
